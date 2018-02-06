@@ -2,7 +2,8 @@
   (:require [clojure
              [string                :as string]
              [walk                  :as walk]]
-            [clj-aws.provider.shell :as sh]))
+            [clj-aws.provider.shell :as sh]
+            [cheshire.core          :as cc]))
 
 
 (defn- not-blank? [s] ((complement clojure.string/blank?) s))
@@ -44,3 +45,13 @@
   [predicates]
   (->> (list-instances)
        (filter (apply every-pred predicates))))
+
+(defn add-tags
+  "Adds or overwrites one or more tags for the specified Amazon EC2 resource or resources.
+  Each resource can have a maximum of 50 tags. Each tag consists of a key and optional value.
+  Tag keys must be unique per resource.
+  https://docs.aws.amazon.com/cli/latest/reference/ec2/create-tags.html"
+  [resources tags]
+  (let [rces (clojure.string/join " " resources)
+        payload (cc/generate-string tags)]
+    (sh/exec (str "aws ec2 create-tags --resources " rces  " --tags '" payload "'"))))
