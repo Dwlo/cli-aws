@@ -63,3 +63,14 @@
   (let [rces (clojure.string/join " " resources)
         tgs  (str " Key=" (clojure.string/join " Key=" tags))]
     (sh/exec (str "aws ec2 delete-tags --resources " rces  " --tags " tgs))))
+
+(defn created-tags
+  "Lists all tags used for instances"
+  []
+  (->> (list-instances)
+       (map :Tags)
+       (filter (complement nil?))
+       (map #(map :Key %))
+       (reduce concat)
+       distinct
+       sort))
