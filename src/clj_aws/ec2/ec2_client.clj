@@ -52,6 +52,14 @@
   Tag keys must be unique per resource.
   https://docs.aws.amazon.com/cli/latest/reference/ec2/create-tags.html"
   [resources tags]
-  (let [rces (clojure.string/join " " resources)
+  (let [rces    (clojure.string/join " " resources)
         payload (cc/generate-string tags)]
     (sh/exec (str "aws ec2 create-tags --resources " rces  " --tags '" payload "'"))))
+
+(defn delete-tags
+  "Deletes the specified set of tags from the specified set of resources.
+  https://docs.aws.amazon.com/cli/latest/reference/ec2/delete-tags.html"
+  [resources tags]
+  (let [rces (clojure.string/join " " resources)
+        tgs  (str " Key=" (clojure.string/join " Key=" tags))]
+    (sh/exec (str "aws ec2 delete-tags --resources " rces  " --tags " tgs))))
