@@ -18,6 +18,11 @@
                                       (:Tags instance)))))
 (def has-tags? (fn [tags] (fn [instance] (reduce #(and %1 ((has-tag? %2) instance)) true tags))))
 
+;; (defn has-tag-with-value? [instance tag value] (->> (filter #(and (= tag   (:Key %))
+;;                                                                  (= value (:Value %)))
+;;                                                            (:Tags instance))
+;;                                                    (seq)))
+
 
 
 (defn describe-instances
@@ -51,7 +56,7 @@
   Each resource can have a maximum of 50 tags. Each tag consists of a key and optional value.
   Tag keys must be unique per resource.
   https://docs.aws.amazon.com/cli/latest/reference/ec2/create-tags.html"
-  [resources tags]
+  [tags resources]
   (let [rces    (clojure.string/join " " resources)
         payload (cc/generate-string tags)]
     (sh/exec (str "aws ec2 create-tags --resources " rces  " --tags '" payload "'"))))
@@ -59,12 +64,12 @@
 (defn delete-tags
   "Deletes the specified set of tags from the specified set of resources.
   https://docs.aws.amazon.com/cli/latest/reference/ec2/delete-tags.html"
-  [resources tags]
+  [tags resources]
   (let [rces (clojure.string/join " " resources)
         tgs  (str " Key=" (clojure.string/join " Key=" tags))]
     (sh/exec (str "aws ec2 delete-tags --resources " rces  " --tags " tgs))))
 
-(defn created-tags
+(defn list-all-tags
   "Lists all tags used for instances"
   []
   (->> (list-instances)
@@ -74,3 +79,9 @@
        (reduce concat)
        distinct
        sort))
+
+(defn get-web-link
+  "Returns a http link to amazon web console with the list of given instances"
+  [instances-ids]
+  (->> (clojure.string/join "," instances-ids)
+       (str "https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#Instances:search=")))
