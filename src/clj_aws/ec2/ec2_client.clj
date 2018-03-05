@@ -12,6 +12,7 @@
 (def is-instance-of-type? (fn [type] (fn [instance] (= type (:InstanceType instance)))))
 (def is-instance-running? (fn [instance] (= "running" (get-in instance [:State :Name]))))
 (def has-no-tags? (fn [instance] (empty? (:Tags instance))))
+(def is-instance-in-state? (fn [state] (fn [instance] (= state (get-in instance [:State :Name])))))
 (def has-tag? (fn [tag] (fn [instance] (some
                                       #(and (= tag (:Key %))
                                             (not-blank? (:Value %)))
