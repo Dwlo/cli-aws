@@ -32,7 +32,7 @@
   [repo image-digest]
   (sh/exec (str "aws ecr batch-delete-image --repository-name " repo " --image-ids imageDigest=" image-digest)))
 
-(defn get-repositories-capacity
+(defn get-repositories-level
   "Returns the number of images in each repository"
   [repositories]
   (->> repositories
