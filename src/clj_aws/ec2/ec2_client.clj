@@ -19,13 +19,6 @@
                                       (:Tags instance)))))
 (def has-tags? (fn [tags] (fn [instance] (reduce #(and %1 ((has-tag? %2) instance)) true tags))))
 
-;; (defn has-tag-with-value? [instance tag value] (->> (filter #(and (= tag   (:Key %))
-;;                                                                  (= value (:Value %)))
-;;                                                            (:Tags instance))
-;;                                                    (seq)))
-
-
-
 (defn describe-instances
   "Describes all instances."
   ([]
