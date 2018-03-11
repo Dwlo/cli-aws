@@ -8,16 +8,44 @@
 
 (defn- not-blank? [s] ((complement clojure.string/blank?) s))
 (def intance-types {:t2-micro "t2.micro"})
-(def is-spot-instance? (fn [instance] (= "spot" (:InstanceLifecycle instance))))
-(def is-instance-of-type? (fn [type] (fn [instance] (= type (:InstanceType instance)))))
-(def is-instance-running? (fn [instance] (= "running" (get-in instance [:State :Name]))))
-(def has-no-tags? (fn [instance] (empty? (:Tags instance))))
-(def is-instance-in-state? (fn [state] (fn [instance] (= state (get-in instance [:State :Name])))))
-(def has-tag? (fn [tag] (fn [instance] (some
-                                      #(and (= tag (:Key %))
-                                            (not-blank? (:Value %)))
-                                      (:Tags instance)))))
-(def has-tags? (fn [tags] (fn [instance] (reduce #(and %1 ((has-tag? %2) instance)) true tags))))
+
+(defn is-spot-instance?
+  [instance]
+  (= "spot" (:InstanceLifecycle instance)))
+
+(defn is-instance-of-type?
+  [type instance]
+  (= type (:InstanceType instance)))
+
+(defn is-instance-running?
+  [instance]
+  (= "running" (get-in instance [:State :Name])))
+
+(defn has-no-tags?
+  [instance]
+  (empty? (:Tags instance)))
+
+(defn is-instance-in-state?
+  [state instance]
+  (= state (get-in instance [:State :Name])))
+
+(defn has-tag?
+  [tag instance]
+  (some
+   #(and (= tag (:Key %))
+         (not-blank? (:Value %)))
+   (:Tags instance)))
+
+(defn has-tags?
+  [tags instance]
+  (reduce #(and %1 ((has-tag? %2) instance)) true tags))
+
+(defn has-tag-with-value?
+  [tag value instance]
+  (->> (filter #(and (= tag   (:Key %))
+                     (= value (:Value %)))
+               (:Tags instance))
+       (seq)))
 
 (defn describe-instances
   "Describes all instances."
